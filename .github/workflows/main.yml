@@ -30,8 +30,8 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key.pem $SSH_USER@$EC2_PUBLIC_DNS '
           echo "Connected to EC2. Current Directory: " &&
-          echo "Changing directory to /home/ubuntu/compiler"
-          cd /home/ubuntu/compiler && 
+          echo "Changing directory to /home/ubuntu/code-generator-ai"
+          cd /home/ubuntu/code-generator-ai && 
           echo "Pulling latest code..." &&
           git pull origin master  && 
           echo "Installing npm packages..." &&
