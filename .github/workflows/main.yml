@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+
+      - name: Run tests
+        run: npm test
+
+      - name: Set up SSH Key
+        run: |
+         echo "${{ secrets.SSH_PRIVATE_KEY }}" > private_key.pem
+         chmod 600 private_key.pem
+
+
+      - name: SSH and Deploy
+        env:
+          EC2_PUBLIC_DNS: ${{ secrets.EC2_PUBLIC_DNS }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          ssh -o StrictHostKeyChecking=no -i private_key.pem $SSH_USER@$EC2_PUBLIC_DNS '
+          echo "Connected to EC2. Current Directory: " &&
+          echo "Changing directory to /home/ubuntu/compiler"
+          cd /home/ubuntu/compiler && 
+          echo "Pulling latest code..." &&
+          git pull origin master  && 
+          echo "Installing npm packages..." &&
+          npm install && 
+          echo "Building the project..." &&
+          npm run build && 
+          echo "Restarting the pm2 process..." &&
+          pm2 restart all &&
+          echo "Exiting the server..." &&
+          exit
+          '
+      
+      - name: Clean up private key
+        run: rm -f private_key.pem
