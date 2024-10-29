@@ -1,4 +1,4 @@
-import { gemini } from "../app";
+import { gemini } from "../app.js";
 
 const generateText = async (prompt: string = "Generate a sample title") => {
   try {
